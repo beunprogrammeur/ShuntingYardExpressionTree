@@ -8,6 +8,6 @@ namespace ShuntingYardAlgorithm.Operators
         {
         }
 
-        public override IOperand Result => new VariableOperand(() => LeftOperand.Value * RightOperand.Value);
+        public override IOperand Result => new RelayOperand(() => LeftOperand.Value * RightOperand.Value);
     }
 }

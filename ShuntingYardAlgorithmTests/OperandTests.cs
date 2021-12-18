@@ -29,9 +29,9 @@ namespace ShuntingYardAlgorithmTests
 
         [TestMethod]
         [DynamicData(nameof(OperandValues), DynamicDataSourceType.Property)]
-        public void VariableOperandTest(double value)
+        public void RelayOperandTest(double value)
         {
-            var voperand = new VariableOperand(() => value);
+            var voperand = new RelayOperand(() => value);
             Assert.AreEqual(value, voperand.Value);
         }
     }

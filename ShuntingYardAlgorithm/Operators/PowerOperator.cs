@@ -9,6 +9,6 @@ namespace ShuntingYardAlgorithm.Operators
         {
         }
 
-        public override IOperand Result => new VariableOperand(() => Math.Pow(LeftOperand.Value, RightOperand.Value));
+        public override IOperand Result => new RelayOperand(() => Math.Pow(LeftOperand.Value, RightOperand.Value));
     }
 }

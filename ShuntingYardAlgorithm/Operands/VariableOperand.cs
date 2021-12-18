@@ -1,4 +1,4 @@
-﻿using System;
+﻿using ShuntingYardAlgorithm.Expression;
 using System.Diagnostics;
 
 namespace ShuntingYardAlgorithm.Operands
@@ -6,10 +6,15 @@ namespace ShuntingYardAlgorithm.Operands
     [DebuggerDisplay("{Value}")]
     internal class VariableOperand : IOperand
     {
-        private readonly Func<double> _value;
+        private readonly IProperty _property;
+        private readonly bool _invert;
 
-        public VariableOperand(Func<double> value) => _value = value;
+        public VariableOperand(IProperty property, bool invert = false) 
+        {
+            _property = property;
+            _invert   = invert;
+        }
 
-        public double Value => _value();
+        public double Value => _invert ? -_property.Read() : _property.Read();
     }
 }

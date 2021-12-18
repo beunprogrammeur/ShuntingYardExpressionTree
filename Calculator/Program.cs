@@ -1,4 +1,5 @@
 ﻿using ShuntingYardAlgorithm;
+using ShuntingYardAlgorithm.Expression;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,10 +41,10 @@ namespace Calculator
 
             foreach (var variable in variables)
             {
-                parser.RegisterVariable(variable.Key, variable.Value);
+                parser.RegisterVariable(new RelayProperty(variable.Key, variable.Value));
             }
 
-            var formula = parser.Parse(input);
+            var formula = parser.ParseFormula(input);
             var result  = formula?.Value;
             Console.WriteLine($"result: {result}");
         }
