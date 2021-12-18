@@ -19,7 +19,7 @@ pi / 180 // assuming you register the pi variable
 // defaults to invariant culture if none is given
 var parser = new Parser();
 
-var operand = parser.Parse("1 + 2 * 5");
+var operand = parser.ParseFormula("1 + 2 * 5");
 
 // prints 11
 Console.WriteLine(operand.Value);
@@ -27,9 +27,9 @@ Console.WriteLine(operand.Value);
 ### Example 2:
 ```
 var parser = new Parser();
-parser.RegisterVariable("unix", () => DateTimeOffset.Now.ToUnixTimeSeconds());
+parser.RegisterVariable(new RelayProperty("unix", () => DateTimeOffset.Now.ToUnixTimeSeconds()));
 
-var operand = parser.Parse("unix % 3");
+var operand = parser.ParseFormula("unix % 3");
 
 while(true)
 {
@@ -56,16 +56,16 @@ Assume you have a graphical application. You draw a recangle on an arbitray loca
 
 Assume you register the following variables with the parser:
 ```
-parser.RegisterVariable("x", () => rectangle.Position.X);
-parser.RegisterVariable("y", () => rectangle.Position.Y);
-parser.RegisterVariable("width", () => rectangle.Width);
-parser.Registervariable("height", () => rectangle.Height);
+parser.RegisterVariable(new RelayProperty("x", () => rectangle.Position.X));
+parser.RegisterVariable(new RelayProperty("y", () => rectangle.Position.Y));
+parser.RegisterVariable(new RelayProperty("width", () => rectangle.Width));
+parser.Registervariable(new RelayProperty("height", () => rectangle.Height));
 ```
 
 Also assume the following code:
 ```
-var xPosition = parser.Parse("x + width / 2");
-var yPosition = parser.Parse("y + height / 2");
+var xPosition = parser.ParseFormula("x + width / 2");
+var yPosition = parser.ParseFormula("y + height / 2");
 
 while(true)
 {
@@ -84,3 +84,49 @@ parsing "1+2+3+4+5+6+7+8+9+0"
 100.000 times in 1076ms
 Requesting the value from the expression:
 100.000 times in 62,3ms
+
+# Added feature: expressions
+I've added the possibility to assign a variable within the expression.
+this means that the following will evaluate to an executable expression that does not return a result:
+
+```
+double myNumber;
+
+var parser = new Parser();
+parser.RegisterVariable(new ValueProperty("number", 0));
+parser.RegisterVariable(new RelayProperty("myNumber", () => myNumber, value => myNumber = value));
+
+var expression = parser.ParseExpression("number = number + 1; myNumber = number");
+
+while(true)
+{
+    expression.Evaluate();
+    // result:
+    // myNumber: 1
+    // myNumber: 2
+    // myNumber: 3
+    // myNumber: 4 etc.
+}
+```
+## A more useful example of expressions
+```
+var rect = new Rectangle();
+var circle = new Circle();
+parser.RegisterVariable(new RelayProperty("rectangle.x", () => rect.X, value => rect.X = value));
+parser.RegisterVariable(new RelayProperty("rectangle.y", () => rect.Y, value => rect.Y = value));
+parser.RegisterVariable(new RelayProperty("rectangle.width", () => rect.Width, value => rect.Width = value));
+parser.RegisterVariable(new RelayProperty("rectangle.height", () => rect.Height, value => rect.Height = value));
+parser.RegisterVariable(new RelayProperty("circle.x", () => circle.X, value => circle.X = value));
+parser.RegisterVariable(new RelayProperty("circle.y", () => circle.Y, value => circle.Y = value));
+
+var expression = parser.ParseExpression("
+    circle.x = rectangle.x + rectangle.width / 2
+    circle.y = rectangle.y + rectangle.height / 2
+");
+
+while(true) {
+    expression.Evaluate();
+}
+
+// when the rectangle would change its position, the circle would "stick" to its center point.
+```
